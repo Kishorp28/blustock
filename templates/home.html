@@ -1,0 +1,551 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Home - Bluestock IPO Management{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<div class="container py-5">
+    <div class="row align-items-center">
+        <div class="col-lg-6 text-center text-lg-start">
+            <img src="{% static 'images/image.png' %}" alt="Bluestock Logo" style="width:120px; height:120px;" class="mb-4">
+            <h1 class="display-4 fw-bold mb-3">Bluestock IPO Management</h1>
+            <p class="lead mb-4">Track, analyze, and manage Initial Public Offerings with ease. Stay updated on the latest IPOs, access key documents, and get answers to all your IPO questions.</p>
+            <div class="d-flex flex-column flex-sm-row gap-3 justify-content-center justify-content-lg-start">
+                <a href="{% url 'upcoming_ipos' %}" class="btn btn-primary btn-lg px-4">
+                    <i class="bi bi-graph-up me-2"></i>View Upcoming IPOs
+                </a>
+                <a href="{% url 'signin' %}" class="btn btn-outline-primary btn-lg px-4">
+                    <i class="bi bi-person me-2"></i>Sign In
+                </a>
+                <a href="{% url 'signup' %}" class="btn btn-success btn-lg px-4">
+                    <i class="bi bi-person-plus me-2"></i>Sign Up
+                </a>
+            </div>
+        </div>
+        <div class="col-lg-6 text-center">
+            <div class="hero-stats bg-light p-4 rounded-3 shadow-sm">
+                <h4 class="mb-3">Quick Stats</h4>
+                <div class="row g-3">
+                    <div class="col-6">
+                        <div class="stat-item">
+                            <i class="bi bi-building text-primary fs-1"></i>
+                            <h5 class="mt-2" id="total-ipos">Loading...</h5>
+                            <small class="text-muted">Total IPOs</small>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="stat-item">
+                            <i class="bi bi-calendar-event text-success fs-1"></i>
+                            <h5 class="mt-2" id="upcoming-ipos">Loading...</h5>
+                            <small class="text-muted">Upcoming</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Features Section -->
+<div class="container py-5">
+    <h2 class="text-center mb-5">Why Choose Bluestock?</h2>
+    <div class="row g-4">
+        <div class="col-md-4">
+            <div class="feature-card text-center p-4 h-100 border rounded-3 shadow-sm">
+                <i class="bi bi-graph-up-arrow text-primary fs-1 mb-3"></i>
+                <h5>Real-time Tracking</h5>
+                <p class="text-muted">Monitor IPO performance and market trends with real-time data and analytics.</p>
+                <a href="{% url 'upcoming_ipos' %}" class="btn btn-outline-primary btn-sm">Learn More</a>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="feature-card text-center p-4 h-100 border rounded-3 shadow-sm">
+                <i class="bi bi-file-earmark-text text-success fs-1 mb-3"></i>
+                <h5>Document Access</h5>
+                <p class="text-muted">Access RHP, DRHP, and other important IPO documents in one place.</p>
+                <a href="{% url 'upcoming_ipos' %}" class="btn btn-outline-success btn-sm">View Documents</a>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="feature-card text-center p-4 h-100 border rounded-3 shadow-sm">
+                <i class="bi bi-shield-check text-warning fs-1 mb-3"></i>
+                <h5>Secure Platform</h5>
+                <p class="text-muted">Your data is protected with enterprise-grade security and encryption.</p>
+                <a href="{% url 'signup' %}" class="btn btn-outline-warning btn-sm">Get Started</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Quick Actions Section -->
+<div class="container py-5">
+    <h2 class="text-center mb-5">Quick Actions</h2>
+    <div class="row g-4">
+        <div class="col-md-3">
+            <div class="quick-action-card text-center p-3 border rounded-3 shadow-sm h-100">
+                <i class="bi bi-search text-primary fs-2 mb-2"></i>
+                <h6>Search IPOs</h6>
+                <button class="btn btn-primary btn-sm" onclick="openSearchModal()">Search</button>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="quick-action-card text-center p-3 border rounded-3 shadow-sm h-100">
+                <i class="bi bi-calendar-plus text-success fs-2 mb-2"></i>
+                <h6>IPO Calendar</h6>
+                <button class="btn btn-success btn-sm" onclick="openCalendarModal()">View Calendar</button>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="quick-action-card text-center p-3 border rounded-3 shadow-sm h-100">
+                <i class="bi bi-question-circle text-info fs-2 mb-2"></i>
+                <h6>FAQ</h6>
+                <a href="{% url 'upcoming_ipos' %}#faq" class="btn btn-info btn-sm">View FAQ</a>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="quick-action-card text-center p-3 border rounded-3 shadow-sm h-100">
+                <i class="bi bi-headset text-warning fs-2 mb-2"></i>
+                <h6>Support</h6>
+                <button class="btn btn-warning btn-sm" onclick="openSupportModal()">Contact</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Search Modal -->
+<div class="modal fade" id="searchModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Search IPOs</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="mb-3">
+                    <label for="searchCompany" class="form-label">Company Name</label>
+                    <input type="text" class="form-control" id="searchCompany" placeholder="Enter company name">
+                </div>
+                <div class="mb-3">
+                    <label for="searchSector" class="form-label">Sector</label>
+                    <select class="form-select" id="searchSector">
+                        <option value="">All Sectors</option>
+                        <option value="technology">Technology</option>
+                        <option value="finance">Finance</option>
+                        <option value="healthcare">Healthcare</option>
+                        <option value="manufacturing">Manufacturing</option>
+                    </select>
+                </div>
+                <div class="mb-3">
+                    <label for="searchStatus" class="form-label">Status</label>
+                    <select class="form-select" id="searchStatus">
+                        <option value="">All Status</option>
+                        <option value="upcoming">Upcoming</option>
+                        <option value="open">Open</option>
+                        <option value="closed">Closed</option>
+                        <option value="listed">Listed</option>
+                    </select>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" onclick="performSearch()">Search</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Calendar Modal -->
+<div class="modal fade" id="calendarModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">IPO Calendar</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="calendar-container">
+                    <div class="calendar-header d-flex justify-content-between align-items-center mb-3">
+                        <button class="btn btn-outline-primary btn-sm" onclick="previousMonth()">
+                            <i class="bi bi-chevron-left"></i>
+                        </button>
+                        <h5 id="currentMonth">January 2024</h5>
+                        <button class="btn btn-outline-primary btn-sm" onclick="nextMonth()">
+                            <i class="bi bi-chevron-right"></i>
+                        </button>
+                    </div>
+                    <div id="calendarBody" class="calendar-body">
+                        <!-- Calendar will be populated by JavaScript -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Support Modal -->
+<div class="modal fade" id="supportModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Contact Support</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="mb-3">
+                    <label for="supportEmail" class="form-label">Email</label>
+                    <input type="email" class="form-control" id="supportEmail" placeholder="your@email.com">
+                </div>
+                <div class="mb-3">
+                    <label for="supportSubject" class="form-label">Subject</label>
+                    <input type="text" class="form-control" id="supportSubject" placeholder="How can we help?">
+                </div>
+                <div class="mb-3">
+                    <label for="supportMessage" class="form-label">Message</label>
+                    <textarea class="form-control" id="supportMessage" rows="4" placeholder="Describe your issue..."></textarea>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" onclick="sendSupportMessage()">Send Message</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Notification Toast -->
+<div class="toast-container position-fixed bottom-0 end-0 p-3">
+    <div id="notificationToast" class="toast" role="alert">
+        <div class="toast-header">
+            <i class="bi bi-info-circle me-2"></i>
+            <strong class="me-auto" id="toastTitle">Notification</strong>
+            <button type="button" class="btn-close" data-bs-dismiss="toast"></button>
+        </div>
+        <div class="toast-body" id="toastMessage">
+            This is a notification message.
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Global variables
+let currentDate = new Date();
+let ipoData = [];
+
+// Initialize page
+document.addEventListener('DOMContentLoaded', function() {
+    loadStats();
+    loadIPOCalendar();
+    setupKeyboardShortcuts();
+});
+
+// Load statistics
+async function loadStats() {
+    try {
+        const response = await fetch('/api/ipos/statistics/');
+        const data = await response.json();
+        
+        document.getElementById('total-ipos').textContent = data.total_ipos || 0;
+        document.getElementById('upcoming-ipos').textContent = data.upcoming_ipos || 0;
+    } catch (error) {
+        console.error('Error loading stats:', error);
+        document.getElementById('total-ipos').textContent = '0';
+        document.getElementById('upcoming-ipos').textContent = '0';
+    }
+}
+
+// Load IPO data for calendar
+async function loadIPOCalendar() {
+    try {
+        const response = await fetch('/api/ipos/');
+        const data = await response.json();
+        ipoData = data.results || data || [];
+    } catch (error) {
+        console.error('Error loading IPO data:', error);
+        ipoData = [];
+    }
+}
+
+// Modal functions
+function openSearchModal() {
+    const modal = new bootstrap.Modal(document.getElementById('searchModal'));
+    modal.show();
+}
+
+function openCalendarModal() {
+    const modal = new bootstrap.Modal(document.getElementById('calendarModal'));
+    modal.show();
+    renderCalendar();
+}
+
+function openSupportModal() {
+    const modal = new bootstrap.Modal(document.getElementById('supportModal'));
+    modal.show();
+}
+
+// Search functionality
+function performSearch() {
+    const company = document.getElementById('searchCompany').value;
+    const sector = document.getElementById('searchSector').value;
+    const status = document.getElementById('searchStatus').value;
+    
+    // Build search URL
+    let searchUrl = "{% url 'upcoming_ipos' %}?";
+    if (company) searchUrl += `company=${encodeURIComponent(company)}&`;
+    if (sector) searchUrl += `sector=${encodeURIComponent(sector)}&`;
+    if (status) searchUrl += `status=${encodeURIComponent(status)}&`;
+    
+    // Close modal and redirect
+    bootstrap.Modal.getInstance(document.getElementById('searchModal')).hide();
+    window.location.href = searchUrl;
+}
+
+// Calendar functionality
+function renderCalendar() {
+    const year = currentDate.getFullYear();
+    const month = currentDate.getMonth();
+    
+    document.getElementById('currentMonth').textContent = 
+        new Date(year, month).toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+    
+    const firstDay = new Date(year, month, 1);
+    const lastDay = new Date(year, month + 1, 0);
+    const startDate = new Date(firstDay);
+    startDate.setDate(startDate.getDate() - firstDay.getDay());
+    
+    let calendarHTML = `
+        <div class="calendar-grid">
+            <div class="calendar-weekdays">
+                <div>Sun</div><div>Mon</div><div>Tue</div><div>Wed</div><div>Thu</div><div>Fri</div><div>Sat</div>
+            </div>
+            <div class="calendar-days">
+    `;
+    
+    for (let i = 0; i < 42; i++) {
+        const date = new Date(startDate);
+        date.setDate(startDate.getDate() + i);
+        
+        const isCurrentMonth = date.getMonth() === month;
+        const isToday = date.toDateString() === new Date().toDateString();
+        const dayClass = `calendar-day ${isCurrentMonth ? 'current-month' : 'other-month'} ${isToday ? 'today' : ''}`;
+        
+        // Check for IPOs on this date
+        const iposOnDate = ipoData.filter(ipo => {
+            const openDate = new Date(ipo.open_date);
+            const closeDate = new Date(ipo.close_date);
+            return date >= openDate && date <= closeDate;
+        });
+        
+        calendarHTML += `
+            <div class="${dayClass}" data-date="${date.toISOString().split('T')[0]}">
+                <span class="day-number">${date.getDate()}</span>
+                ${iposOnDate.length > 0 ? `<div class="ipo-indicator" title="${iposOnDate.length} IPO(s)">${iposOnDate.length}</div>` : ''}
+            </div>
+        `;
+    }
+    
+    calendarHTML += '</div></div>';
+    document.getElementById('calendarBody').innerHTML = calendarHTML;
+}
+
+function previousMonth() {
+    currentDate.setMonth(currentDate.getMonth() - 1);
+    renderCalendar();
+}
+
+function nextMonth() {
+    currentDate.setMonth(currentDate.getMonth() + 1);
+    renderCalendar();
+}
+
+// Support functionality
+function sendSupportMessage() {
+    const email = document.getElementById('supportEmail').value;
+    const subject = document.getElementById('supportSubject').value;
+    const message = document.getElementById('supportMessage').value;
+    
+    if (!email || !subject || !message) {
+        showNotification('Please fill in all fields', 'error');
+        return;
+    }
+    
+    // Simulate sending message
+    showNotification('Support message sent successfully! We\'ll get back to you soon.', 'success');
+    bootstrap.Modal.getInstance(document.getElementById('supportModal')).hide();
+    
+    // Clear form
+    document.getElementById('supportEmail').value = '';
+    document.getElementById('supportSubject').value = '';
+    document.getElementById('supportMessage').value = '';
+}
+
+// Notification system
+function showNotification(message, type = 'info') {
+    const toast = document.getElementById('notificationToast');
+    const toastTitle = document.getElementById('toastTitle');
+    const toastMessage = document.getElementById('toastMessage');
+    
+    // Set title and icon based on type
+    switch(type) {
+        case 'success':
+            toastTitle.innerHTML = '<i class="bi bi-check-circle text-success me-2"></i>Success';
+            break;
+        case 'error':
+            toastTitle.innerHTML = '<i class="bi bi-exclamation-triangle text-danger me-2"></i>Error';
+            break;
+        case 'warning':
+            toastTitle.innerHTML = '<i class="bi bi-exclamation-circle text-warning me-2"></i>Warning';
+            break;
+        default:
+            toastTitle.innerHTML = '<i class="bi bi-info-circle text-info me-2"></i>Info';
+    }
+    
+    toastMessage.textContent = message;
+    
+    const bsToast = new bootstrap.Toast(toast);
+    bsToast.show();
+}
+
+// Keyboard shortcuts
+function setupKeyboardShortcuts() {
+    document.addEventListener('keydown', function(e) {
+        // Ctrl/Cmd + K for search
+        if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
+            e.preventDefault();
+            openSearchModal();
+        }
+        
+        // Ctrl/Cmd + C for calendar
+        if ((e.ctrlKey || e.metaKey) && e.key === 'c') {
+            e.preventDefault();
+            openCalendarModal();
+        }
+        
+        // Ctrl/Cmd + H for help/support
+        if ((e.ctrlKey || e.metaKey) && e.key === 'h') {
+            e.preventDefault();
+            openSupportModal();
+        }
+    });
+}
+
+// Auto-refresh stats every 5 minutes
+setInterval(loadStats, 300000);
+</script>
+
+<style>
+.hero-stats {
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+}
+
+.feature-card {
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.feature-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 25px rgba(0,0,0,0.1) !important;
+}
+
+.quick-action-card {
+    transition: transform 0.2s, box-shadow 0.2s;
+    cursor: pointer;
+}
+
+.quick-action-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 20px rgba(0,0,0,0.1) !important;
+}
+
+.calendar-grid {
+    display: grid;
+    gap: 1px;
+    background: #dee2e6;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.calendar-weekdays {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    background: #f8f9fa;
+}
+
+.calendar-weekdays > div {
+    padding: 10px;
+    text-align: center;
+    font-weight: 600;
+    font-size: 0.9rem;
+    color: #6c757d;
+}
+
+.calendar-days {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    background: white;
+}
+
+.calendar-day {
+    min-height: 60px;
+    padding: 5px;
+    border: 1px solid #f1f3f4;
+    position: relative;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.calendar-day:hover {
+    background-color: #f8f9fa;
+}
+
+.calendar-day.other-month {
+    background-color: #f8f9fa;
+    color: #adb5bd;
+}
+
+.calendar-day.today {
+    background-color: #e3f2fd;
+    font-weight: bold;
+}
+
+.day-number {
+    font-size: 0.9rem;
+    font-weight: 500;
+}
+
+.ipo-indicator {
+    position: absolute;
+    top: 2px;
+    right: 2px;
+    background: #dc3545;
+    color: white;
+    border-radius: 50%;
+    width: 18px;
+    height: 18px;
+    font-size: 0.7rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+}
+
+@media (max-width: 768px) {
+    .hero-stats {
+        margin-top: 2rem;
+    }
+    
+    .calendar-day {
+        min-height: 50px;
+        font-size: 0.8rem;
+    }
+    
+    .ipo-indicator {
+        width: 16px;
+        height: 16px;
+        font-size: 0.6rem;
+    }
+}
+</style>
+{% endblock %} 

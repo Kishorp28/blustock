@@ -1,0 +1,263 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ ipo.company.name }} - IPO Details{% endblock %}
+
+{% block content %}
+<!-- Breadcrumb -->
+<nav aria-label="breadcrumb" class="mb-4">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{% url 'home' %}">Home</a></li>
+        <li class="breadcrumb-item active">{{ ipo.company.name }}</li>
+    </ol>
+</nav>
+
+<!-- IPO Header -->
+<div class="row mb-4">
+    <div class="col-md-8">
+        <div class="d-flex align-items-center">
+            <img src="{% static 'images/bluestock_logo.png' %}" alt="Bluestock Logo" class="logo-class me-4"
+                 style="width: 100px; height: 100px;"
+                 onerror="this.src='/static/images/default-logo.png'">
+            <div>
+                <h1 class="mb-2">{{ ipo.company.name }}</h1>
+                <span class="badge fs-6 {{ status_badge_class }}">{{ ipo.get_status_display }}</span>
+                <p class="text-muted mb-0">IPO ID: {{ ipo.id }}</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4 text-end">
+        <a href="{% url 'home' %}" class="btn btn-outline-secondary">
+            <i class="bi bi-arrow-left"></i> Back to List
+        </a>
+    </div>
+</div>
+
+<!-- Main Content -->
+<div class="row">
+    <!-- IPO Details -->
+    <div class="col-lg-8">
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="bi bi-info-circle"></i> IPO Details</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label text-muted">Price Band</label>
+                        <div class="fw-bold fs-5">{{ ipo.price_band }}</div>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label text-muted">Issue Size</label>
+                        <div class="fw-bold fs-5">₹{{ ipo.issue_size }} Crores</div>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label text-muted">Issue Type</label>
+                        <div class="fw-bold">{{ ipo.get_issue_type_display }}</div>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label text-muted">Open Date</label>
+                        <div class="fw-bold">{{ ipo.open_date|date:"d M Y" }}</div>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label text-muted">Close Date</label>
+                        <div class="fw-bold">{{ ipo.close_date|date:"d M Y" }}</div>
+                    </div>
+                    {% if ipo.listing_date %}
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label text-muted">Listing Date</label>
+                        <div class="fw-bold">{{ ipo.listing_date|date:"d M Y" }}</div>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Pricing Information -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="bi bi-currency-dollar"></i> Pricing Information</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    {% if ipo.ipo_price %}
+                    <div class="col-md-4 mb-3">
+                        <label class="form-label text-muted">IPO Price</label>
+                        <div class="fw-bold fs-5 text-primary">₹{{ ipo.ipo_price }}</div>
+                    </div>
+                    {% endif %}
+                    {% if ipo.listing_price %}
+                    <div class="col-md-4 mb-3">
+                        <label class="form-label text-muted">Listing Price</label>
+                        <div class="fw-bold fs-5 text-success">₹{{ ipo.listing_price }}</div>
+                    </div>
+                    {% endif %}
+                    {% if ipo.current_market_price %}
+                    <div class="col-md-4 mb-3">
+                        <label class="form-label text-muted">Current Market Price</label>
+                        <div class="fw-bold fs-5 text-info">₹{{ ipo.current_market_price }}</div>
+                    </div>
+                    {% endif %}
+                </div>
+                
+                {% if ipo.listing_gain is not None or ipo.current_return is not None %}
+                <hr>
+                <div class="row">
+                    {% if ipo.listing_gain is not None %}
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label text-muted">Listing Gain</label>
+                        <div class="fw-bold fs-5 {{ ipo.listing_gain >= 0|yesno:'text-success,text-danger' }}">
+                            {{ ipo.listing_gain >= 0|yesno:'+,' }}{{ ipo.listing_gain }}%
+                        </div>
+                    </div>
+                    {% endif %}
+                    {% if ipo.current_return is not None %}
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label text-muted">Current Return</label>
+                        <div class="fw-bold fs-5 {{ ipo.current_return >= 0|yesno:'text-success,text-danger' }}">
+                            {{ ipo.current_return >= 0|yesno:'+,' }}{{ ipo.current_return }}%
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Sidebar -->
+    <div class="col-lg-4">
+        <!-- Documents -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="bi bi-file-earmark-text"></i> Documents</h5>
+            </div>
+            <div class="card-body">
+                {% if ipo.documents.all %}
+                    {% for document in ipo.documents.all %}
+                        {% if document.rhp_pdf %}
+                        <div class="mb-3">
+                            <label class="form-label text-muted">Red Herring Prospectus (RHP)</label>
+                            <div>
+                                <a href="{{ document.rhp_pdf.url }}" class="btn btn-outline-primary btn-sm" target="_blank">
+                                    <i class="bi bi-download"></i> Download RHP
+                                </a>
+                            </div>
+                        </div>
+                        {% endif %}
+                        {% if document.drhp_pdf %}
+                        <div class="mb-3">
+                            <label class="form-label text-muted">Draft Red Herring Prospectus (DRHP)</label>
+                            <div>
+                                <a href="{{ document.drhp_pdf.url }}" class="btn btn-outline-secondary btn-sm" target="_blank">
+                                    <i class="bi bi-download"></i> Download DRHP
+                                </a>
+                            </div>
+                        </div>
+                        {% endif %}
+                    {% endfor %}
+                {% else %}
+                    <p class="text-muted mb-0">No documents available</p>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Company Information -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="bi bi-building"></i> Company Information</h5>
+            </div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <label class="form-label text-muted">Company Name</label>
+                    <div class="fw-bold">{{ ipo.company.name }}</div>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label text-muted">Created</label>
+                    <div class="text-muted">{{ ipo.company.created_at|date:"d M Y" }}</div>
+                </div>
+                <div class="mb-0">
+                    <label class="form-label text-muted">Last Updated</label>
+                    <div class="text-muted">{{ ipo.company.updated_at|date:"d M Y" }}</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- IPO Timeline -->
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="bi bi-calendar-event"></i> Timeline</h5>
+            </div>
+            <div class="card-body">
+                <div class="timeline">
+                    <div class="timeline-item">
+                        <div class="timeline-marker bg-primary"></div>
+                        <div class="timeline-content">
+                            <h6 class="mb-1">Open Date</h6>
+                            <p class="text-muted mb-0">{{ ipo.open_date|date:"d M Y" }}</p>
+                        </div>
+                    </div>
+                    <div class="timeline-item">
+                        <div class="timeline-marker bg-warning"></div>
+                        <div class="timeline-content">
+                            <h6 class="mb-1">Close Date</h6>
+                            <p class="text-muted mb-0">{{ ipo.close_date|date:"d M Y" }}</p>
+                        </div>
+                    </div>
+                    {% if ipo.listing_date %}
+                    <div class="timeline-item">
+                        <div class="timeline-marker bg-success"></div>
+                        <div class="timeline-content">
+                            <h6 class="mb-1">Listing Date</h6>
+                            <p class="text-muted mb-0">{{ ipo.listing_date|date:"d M Y" }}</p>
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+.timeline {
+    position: relative;
+    padding-left: 30px;
+}
+
+.timeline-item {
+    position: relative;
+    margin-bottom: 20px;
+}
+
+.timeline-marker {
+    position: absolute;
+    left: -35px;
+    top: 5px;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+}
+
+.timeline-item:not(:last-child)::before {
+    content: '';
+    position: absolute;
+    left: -29px;
+    top: 17px;
+    width: 2px;
+    height: calc(100% + 3px);
+    background-color: #dee2e6;
+}
+
+.timeline-content h6 {
+    font-size: 0.9rem;
+    margin-bottom: 0.25rem;
+}
+
+.timeline-content p {
+    font-size: 0.8rem;
+}
+</style>
+{% endblock %} 

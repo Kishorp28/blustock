@@ -1,0 +1,710 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>IPO Admin Dashboard</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    html, body {
+      height: 100%;
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Segoe UI', sans-serif;
+      background: #f5f5f9;
+      color: #333;
+    }
+    *, *:before, *:after {
+      box-sizing: inherit;
+    }
+    .sidebar {
+      position: fixed;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      width: 180px;
+      background: #fff;
+      padding: 20px 10px;
+      border-right: 1px solid #ddd;
+      height: 100vh;
+      z-index: 10;
+    }
+    .sidebar h2 {
+      font-size: 17px;
+      margin-bottom: 28px;
+      color: #223;
+      text-align: center;
+    }
+    .menu a {
+      display: block;
+      padding: 10px 0;
+      color: #666;
+      text-decoration: none;
+      font-size: 14px;
+      text-align: left;
+      transition: color 0.2s;
+    }
+    .menu a.active, .menu a:hover {
+      color: #444;
+      font-weight: 600;
+    }
+    .main {
+      margin-left: 180px;
+      padding: 30px 30px 30px 30px;
+      min-height: 100vh;
+      background: #f5f5f9;
+      transition: margin 0.2s;
+    }
+    .topbar {
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+      gap: 18px;
+      margin-bottom: 18px;
+    }
+    .topbar input {
+      padding: 8px 14px;
+      border: 1px solid #ddd;
+      border-radius: 20px;
+      width: 200px;
+      background: #fff;
+    }
+    .topbar .user-greeting {
+      font-weight: 500;
+      color: #444;
+      margin-left: 8px;
+    }
+    .dashboard-header {
+      font-size: 22px;
+      margin: 18px 0 24px 0;
+      font-weight: 600;
+    }
+    .dashboard-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 24px;
+      align-items: flex-start;
+      margin-bottom: 24px;
+    }
+    .stats-row {
+      display: flex;
+      gap: 24px;
+      flex: 1 1 340px;
+      min-width: 320px;
+      justify-content: space-between;
+    }
+    .circle-chart {
+      width: 130px;
+      height: 130px;
+      background: #fff;
+      border-radius: 16px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+      text-align: center;
+      padding: 18px 0 10px 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+    .circle-chart h3 {
+      font-size: 15px;
+      margin-top: 10px;
+      font-weight: 500;
+    }
+    .quick-links {
+      background: #fff;
+      border-radius: 16px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+      padding: 20px 24px 16px 24px;
+      min-width: 260px;
+      flex: 1 1 260px;
+      margin-top: 0;
+    }
+    .quick-links h3 {
+      font-size: 17px;
+      margin-bottom: 12px;
+      font-weight: 600;
+    }
+    .quick-links ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+    .quick-links li {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+      font-size: 14px;
+      padding: 0 0 0 2px;
+    }
+    .quick-links a {
+      color: #3498db;
+      text-decoration: none;
+      font-size: 13px;
+      font-weight: 500;
+      margin-left: 10px;
+    }
+    .right-card {
+      background: #fff;
+      border-radius: 16px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+      padding: 22px 24px 18px 24px;
+      margin-top: 0;
+      min-width: 320px;
+      flex: 1 1 340px;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+    }
+    .right-card h3 {
+      font-size: 17px;
+      margin-bottom: 6px;
+      font-weight: 600;
+    }
+    .right-card p {
+      font-size: 13px;
+      color: #666;
+      margin-bottom: 10px;
+    }
+    .view-report {
+      display: inline-block;
+      padding: 8px 16px;
+      background: #5d78ff;
+      color: #fff;
+      text-decoration: none;
+      border-radius: 6px;
+      font-size: 14px;
+      margin-bottom: 15px;
+    }
+    .doughnut-container {
+      width: 220px;
+      margin-top: 20px;
+      align-self: center;
+    }
+    @media (max-width: 1100px) {
+      .dashboard-grid {
+        flex-direction: column;
+        gap: 18px;
+      }
+      .stats-row, .right-card, .quick-links {
+        min-width: 0;
+        width: 100%;
+        flex: 1 1 100%;
+      }
+      .doughnut-container {
+        width: 100%;
+        min-width: 0;
+      }
+    }
+    @media (max-width: 768px) {
+      .main {
+        margin-left: 0;
+        padding: 16px 4vw 16px 4vw;
+      }
+      .sidebar {
+        position: static;
+        width: 100%;
+        height: auto;
+        border-right: none;
+        border-bottom: 1px solid #ddd;
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
+        padding: 10px 12px;
+      }
+      .sidebar h2 {
+        margin-bottom: 0;
+        font-size: 16px;
+      }
+      .menu {
+        display: flex;
+        gap: 12px;
+      }
+      .menu a {
+        padding: 6px 0;
+        font-size: 13px;
+      }
+      .dashboard-header {
+        font-size: 18px;
+      }
+      .circle-chart {
+        width: 100px;
+        height: 100px;
+        padding: 10px 0 6px 0;
+      }
+      .right-card, .quick-links {
+        padding: 14px 10px 10px 10px;
+      }
+    }
+    @media (max-width: 600px) {
+      .dashboard-grid {
+        flex-direction: column;
+        gap: 12px;
+      }
+      .stats-row {
+        flex-direction: column;
+        gap: 12px;
+      }
+      .main {
+        padding: 8px 2vw 8px 2vw;
+      }
+    }
+    @keyframes pulse {
+      0% { opacity: 1; }
+      50% { opacity: 0.5; }
+      100% { opacity: 1; }
+    }
+    .notification {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      background: #28a745;
+      color: white;
+      padding: 15px 20px;
+      border-radius: 8px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+      z-index: 1000;
+      transform: translateX(100%);
+      transition: transform 0.3s ease;
+    }
+    .notification.show {
+      transform: translateX(0);
+    }
+    .notification.error {
+      background: #dc3545;
+    }
+    .notification.warning {
+      background: #ffc107;
+      color: #212529;
+    }
+    .notification.info {
+      background: #17a2b8;
+    }
+  </style>
+</head>
+<body>
+<div class="sidebar">
+  <h2>Bluestock Fintech</h2>
+  <div class="menu">
+    <a href="{% url 'admin_dashboard' %}" class="active">Dashboard</a>
+    <a href="{% url 'manage_ipo' %}">Manage IPO</a>
+    <a href="{% url 'ipo_subscription' %}">IPO Subscription</a>
+    <a href="{% url 'ipo_allotment' %}">IPO Allotment</a>
+    <br>
+    <a href="{% url 'settings' %}">Settings</a>
+    <a href="{% url 'api_manager' %}">API Manager</a>
+    <a href="{% url 'accounts' %}">Accounts</a>
+    <a href="{% url 'help' %}">Help</a>
+  </div>
+</div>
+<div class="main">
+  <div class="topbar">
+    <form method="get" action="{% url 'manage_ipo' %}" style="display: flex; gap: 10px; align-items: center;">
+      <input type="text" name="search" placeholder="Search IPOs..." value="{{ request.GET.search }}">
+      <button type="submit" style="padding: 8px 14px; background: #5d78ff; color: #fff; border: none; border-radius: 20px; cursor: pointer;">
+        <i class="fas fa-search"></i> Search
+      </button>
+    </form>
+    <div style="display: flex; align-items: center; gap: 15px;">
+      <div style="display: flex; gap: 8px;">
+        <button onclick="exportDashboardData()" style="padding: 8px 12px; background: #28a745; color: #fff; border: none; border-radius: 6px; cursor: pointer; font-size: 12px;" title="Export Data (Ctrl+E)">
+          <i class="fas fa-download"></i>
+        </button>
+        <button onclick="printDashboard()" style="padding: 8px 12px; background: #17a2b8; color: #fff; border: none; border-radius: 6px; cursor: pointer; font-size: 12px;" title="Print Dashboard (Ctrl+P)">
+          <i class="fas fa-print"></i>
+        </button>
+        <button onclick="location.reload()" style="padding: 8px 12px; background: #ffc107; color: #212529; border: none; border-radius: 6px; cursor: pointer; font-size: 12px;" title="Refresh Dashboard">
+          <i class="fas fa-sync"></i>
+        </button>
+        <button onclick="window.location.href='{% url 'manage_ipo' %}'" style="padding: 8px 12px; background: #6c757d; color: #fff; border: none; border-radius: 6px; cursor: pointer; font-size: 12px;" title="Manage IPOs">
+          <i class="fas fa-list"></i>
+        </button>
+      </div>
+      <div class="user-greeting">Hi, {{ request.user.first_name|default:request.user.username }}</div>
+      <a href="{% url 'logout' %}" style="padding: 8px 16px; background: #dc3545; color: #fff; text-decoration: none; border-radius: 6px; font-size: 14px;">
+        <i class="fas fa-sign-out-alt"></i> Logout
+      </a>
+    </div>
+  </div>
+  <div class="dashboard-header">
+    Dashboard
+    <div style="display: flex; align-items: center; gap: 10px; margin-left: 20px; font-size: 14px; color: #666;">
+      <span id="last-updated">Last updated: {{ "now"|date:"H:i" }}</span>
+      <span id="live-indicator" style="display: inline-block; width: 8px; height: 8px; background: #28a745; border-radius: 50%; animation: pulse 2s infinite;"></span>
+      <span id="live-text">Live</span>
+    </div>
+  </div>
+  <div class="dashboard-grid">
+    <div class="stats-row">
+      <div class="circle-chart">
+        <canvas id="lossChart"></canvas>
+        <h3>IPO in Loss</h3>
+      </div>
+      <div class="circle-chart">
+        <canvas id="totalChart"></canvas>
+        <h3>Total IPO</h3>
+      </div>
+      <div class="circle-chart">
+        <canvas id="gainChart"></canvas>
+        <h3>IPO in Gain</h3>
+      </div>
+    </div>
+    <div class="quick-links">
+      <h3>Quick Links</h3>
+      <ul>
+        <li>NSE India <a href="https://www.nseindia.com" target="_blank" rel="noopener noreferrer">Visit Now</a></li>
+        <li>BSE India <a href="https://www.bseindia.com" target="_blank" rel="noopener noreferrer">Visit Now</a></li>
+        <li>SEBI <a href="https://www.sebi.gov.in" target="_blank" rel="noopener noreferrer">Visit Now</a></li>
+        <li>Money Control <a href="https://www.moneycontrol.com" target="_blank" rel="noopener noreferrer">Visit Now</a></li>
+      </ul>
+    </div>
+    <div class="right-card">
+      <h3>Main Board IPO</h3>
+      <p>From 01 Jan 2024</p>
+      <a href="{% url 'manage_ipo' %}" class="view-report">View Report</a>
+      <div class="doughnut-container">
+        <canvas id="ipoBoardChart"></canvas>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="notification" id="notification">
+  <span id="notification-message"></span>
+</div>
+<script>
+  // Circular Stat Charts
+  new Chart(document.getElementById("lossChart"), {
+    type: 'doughnut',
+    data: {
+      labels: ['Loss', 'Other'],
+      datasets: [{
+        data: [{{ ipos_in_loss|default:0 }}, {{ not_in_loss|default:0 }}],
+        backgroundColor: ['#7f7fd5', '#e0e0e0']
+      }]
+    },
+    options: { 
+      cutout: '70%', 
+      plugins: {legend: {display: false}},
+      onClick: function(event, elements) {
+        if (elements.length > 0) {
+          window.location.href = "{% url 'manage_ipo' %}?status=listed&filter=loss";
+        }
+      }
+    }
+  });
+  new Chart(document.getElementById("totalChart"), {
+    type: 'doughnut',
+    data: {
+      labels: ['Total', 'Other'],
+      datasets: [{
+        data: [{{ total_ipos|default:0 }}, 0],
+        backgroundColor: ['#ffa500', '#e0e0e0']
+      }]
+    },
+    options: { 
+      cutout: '70%', 
+      plugins: {legend: {display: false}},
+      onClick: function(event, elements) {
+        if (elements.length > 0) {
+          window.location.href = "{% url 'manage_ipo' %}";
+        }
+      }
+    }
+  });
+  new Chart(document.getElementById("gainChart"), {
+    type: 'doughnut',
+    data: {
+      labels: ['Gain', 'Other'],
+      datasets: [{
+        data: [{{ ipos_in_gain|default:0 }}, {{ not_in_gain|default:0 }}],
+        backgroundColor: ['#26c6da', '#e0e0e0']
+      }]
+    },
+    options: { 
+      cutout: '70%', 
+      plugins: {legend: {display: false}},
+      onClick: function(event, elements) {
+        if (elements.length > 0) {
+          window.location.href = "{% url 'manage_ipo' %}?status=listed&filter=gain";
+        }
+      }
+    }
+  });
+  // Main Board IPO Doughnut Chart
+  new Chart(document.getElementById("ipoBoardChart"), {
+    type: 'doughnut',
+    data: {
+      labels: ['Upcoming', 'New Listed', 'Ongoing'],
+      datasets: [{
+        data: [{{ main_board_upcoming|default:0 }}, {{ main_board_new_listed|default:0 }}, {{ main_board_ongoing|default:0 }}],
+        backgroundColor: ['#7f7fd5', '#5d78ff', '#b2b2ff']
+      }]
+    },
+    options: {
+      cutout: '70%',
+      plugins: {
+        legend: {
+          display: true,
+          position: 'bottom',
+          onClick: function(event, legendItem) {
+            const statusMap = {
+              0: 'upcoming',
+              1: 'listed', 
+              2: 'ongoing'
+            };
+            const status = statusMap[legendItem.index];
+            if (status) {
+              window.location.href = "{% url 'manage_ipo' %}?status=" + status;
+            }
+          }
+        }
+      }
+    }
+  });
+
+  // Search functionality with suggestions
+  document.addEventListener('DOMContentLoaded', function() {
+    const searchInput = document.querySelector('input[name="search"]');
+    const searchForm = document.querySelector('form[action*="manage_ipo"]');
+    
+    // Add search suggestions
+    searchInput.addEventListener('input', function() {
+      const query = this.value.toLowerCase();
+      if (query.length > 2) {
+        // You can add AJAX call here to get search suggestions
+        console.log('Searching for:', query);
+      }
+    });
+
+    // Add keyboard shortcuts
+    document.addEventListener('keydown', function(e) {
+      // Ctrl/Cmd + K to focus search
+      if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
+        e.preventDefault();
+        searchInput.focus();
+      }
+      
+      // Enter to submit search
+      if (e.key === 'Enter' && document.activeElement === searchInput) {
+        searchForm.submit();
+      }
+    });
+
+    // Add click handlers for quick actions
+    const quickLinks = document.querySelectorAll('.quick-links a');
+    quickLinks.forEach(link => {
+      link.addEventListener('click', function(e) {
+        // Add analytics tracking
+        console.log('Quick link clicked:', this.href);
+      });
+    });
+
+    // Add chart hover effects
+    const charts = document.querySelectorAll('canvas');
+    charts.forEach(canvas => {
+      canvas.style.cursor = 'pointer';
+      canvas.addEventListener('mouseenter', function() {
+        this.style.transform = 'scale(1.05)';
+        this.style.transition = 'transform 0.2s ease';
+      });
+      canvas.addEventListener('mouseleave', function() {
+        this.style.transform = 'scale(1)';
+      });
+    });
+
+    // Add dashboard refresh functionality
+    const refreshDashboard = function() {
+      location.reload();
+    };
+
+    // Auto-refresh dashboard every 5 minutes
+    setInterval(refreshDashboard, 300000);
+
+    // Add notification for new IPOs
+    const checkNewIPOs = function() {
+      // You can add AJAX call here to check for new IPOs
+      console.log('Checking for new IPOs...');
+    };
+
+    // Check for new IPOs every 2 minutes
+    setInterval(checkNewIPOs, 120000);
+  });
+
+  // Add export functionality
+  function exportDashboardData() {
+    const data = {
+      total_ipos: {{ total_ipos|default:0 }},
+      ipos_in_gain: {{ ipos_in_gain|default:0 }},
+      ipos_in_loss: {{ ipos_in_loss|default:0 }},
+      main_board_upcoming: {{ main_board_upcoming|default:0 }},
+      main_board_new_listed: {{ main_board_new_listed|default:0 }},
+      main_board_ongoing: {{ main_board_ongoing|default:0 }},
+      export_date: new Date().toISOString()
+    };
+    
+    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'dashboard_data.json';
+    a.click();
+    URL.revokeObjectURL(url);
+  }
+
+  // Add print functionality
+  function printDashboard() {
+    window.print();
+  }
+
+  // Add keyboard shortcuts for export and print
+  document.addEventListener('keydown', function(e) {
+    if ((e.ctrlKey || e.metaKey) && e.key === 'e') {
+      e.preventDefault();
+      exportDashboardData();
+    }
+    if ((e.ctrlKey || e.metaKey) && e.key === 'p') {
+      e.preventDefault();
+      printDashboard();
+    }
+  });
+
+  // Add notification functionality
+  function showNotification(message, type = 'success') {
+    const notification = document.getElementById('notification');
+    const messageElement = document.getElementById('notification-message');
+    
+    messageElement.textContent = message;
+    notification.className = `notification ${type} show`;
+    
+    setTimeout(() => {
+      notification.classList.remove('show');
+    }, 3000);
+  }
+
+  // Update last updated time
+  function updateLastUpdated() {
+    const now = new Date();
+    const timeString = now.toLocaleTimeString('en-US', { 
+      hour12: false, 
+      hour: '2-digit', 
+      minute: '2-digit' 
+    });
+    document.getElementById('last-updated').textContent = `Last updated: ${timeString}`;
+  }
+
+  // Simulate real-time updates
+  function simulateRealTimeUpdates() {
+    // Simulate new IPO notification
+    const randomEvents = [
+      { message: 'New IPO: TechCorp Ltd has been added', type: 'info' },
+      { message: 'IPO status updated: FinTech Solutions is now listed', type: 'success' },
+      { message: 'System backup completed successfully', type: 'success' },
+      { message: 'High subscription rate detected for MegaCorp IPO', type: 'warning' }
+    ];
+    
+    const randomEvent = randomEvents[Math.floor(Math.random() * randomEvents.length)];
+    
+    // Show notification every 30 seconds (for demo purposes)
+    setTimeout(() => {
+      showNotification(randomEvent.message, randomEvent.type);
+      updateLastUpdated();
+    }, 30000);
+  }
+
+  // Initialize real-time features
+  document.addEventListener('DOMContentLoaded', function() {
+    // Start real-time updates
+    simulateRealTimeUpdates();
+    
+    // Update time every minute
+    setInterval(updateLastUpdated, 60000);
+    
+    // Show welcome notification
+    setTimeout(() => {
+      showNotification('Dashboard loaded successfully! Welcome back.', 'success');
+    }, 1000);
+  });
+
+  // Add chart tooltips and interactions
+  function addChartInteractions() {
+    const charts = document.querySelectorAll('canvas');
+    charts.forEach(canvas => {
+      canvas.addEventListener('click', function(e) {
+        const rect = this.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+        
+        // Show tooltip with chart data
+        showNotification('Chart clicked! Navigate to detailed view.', 'info');
+      });
+    });
+  }
+
+  // Add keyboard shortcuts help
+  function showKeyboardShortcuts() {
+    const shortcuts = [
+      'Ctrl+K: Focus search',
+      'Ctrl+E: Export data',
+      'Ctrl+P: Print dashboard',
+      'Ctrl+R: Refresh page'
+    ];
+    
+    const message = 'Keyboard shortcuts:\n' + shortcuts.join('\n');
+    alert(message);
+  }
+
+  // Add keyboard shortcut for help
+  document.addEventListener('keydown', function(e) {
+    if ((e.ctrlKey || e.metaKey) && e.key === 'h') {
+      e.preventDefault();
+      showKeyboardShortcuts();
+    }
+  });
+
+  // Add dashboard analytics
+  function trackDashboardUsage() {
+    const usageData = {
+      timestamp: new Date().toISOString(),
+      user: '{{ request.user.username }}',
+      action: 'dashboard_view',
+      charts_clicked: 0,
+      exports_count: 0
+    };
+    
+    // Store in localStorage for demo
+    localStorage.setItem('dashboard_usage', JSON.stringify(usageData));
+  }
+
+  // Initialize all features
+  document.addEventListener('DOMContentLoaded', function() {
+    addChartInteractions();
+    trackDashboardUsage();
+    
+    // Add success notifications for actions
+    const exportBtn = document.querySelector('button[onclick="exportDashboardData()"]');
+    const printBtn = document.querySelector('button[onclick="printDashboard()"]');
+    const refreshBtn = document.querySelector('button[onclick="location.reload()"]');
+    
+    if (exportBtn) {
+      exportBtn.addEventListener('click', () => {
+        setTimeout(() => showNotification('Dashboard data exported successfully!', 'success'), 100);
+      });
+    }
+    
+    if (printBtn) {
+      printBtn.addEventListener('click', () => {
+        setTimeout(() => showNotification('Print dialog opened!', 'info'), 100);
+      });
+    }
+    
+    if (refreshBtn) {
+      refreshBtn.addEventListener('click', () => {
+        showNotification('Refreshing dashboard...', 'info');
+      });
+    }
+  });
+</script>
+</body>
+</html> 
