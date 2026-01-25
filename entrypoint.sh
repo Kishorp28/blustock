@@ -11,6 +11,10 @@ echo "PostgreSQL started."
 echo "Applying database migrations..."
 python manage.py migrate --noinput
 
+# Populate default data
+echo "Populating default data..."
+python manage.py populate_default_data
+
 # Collect static files
 echo "Collecting static files..."
 python manage.py collectstatic --noinput
