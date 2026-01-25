@@ -58,7 +58,7 @@ def home(request):
     faqs = FAQ.objects.filter(active=True).order_by('order')
     context = {'ipos': ipos, 'faqs': faqs}
     companies = Company.objects.all()
-    return render(request, 'upcoming_ipos.html', {
+    return render(request, 'home.html', {
         'companies': companies
     })
     #return render(request, 'upcoming_ipos.html', context)
