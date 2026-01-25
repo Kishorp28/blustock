@@ -57,7 +57,11 @@ def home(request):
         })
     faqs = FAQ.objects.filter(active=True).order_by('order')
     context = {'ipos': ipos, 'faqs': faqs}
-    return render(request, 'upcoming_ipos.html', context)
+    companies = Company.objects.all()
+    return render(request, 'upcoming_ipos.html', {
+        'companies': companies
+    })
+    #return render(request, 'upcoming_ipos.html', context)
 
 
 def ipo_detail(request, ipo_id):

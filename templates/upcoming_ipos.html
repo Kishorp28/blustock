@@ -494,10 +494,10 @@
             <div class="ipo-item" data-sector="{{ ipo.sector|default:'other' }}" data-status="{{ ipo.status|default:'upcoming' }}" data-company="{{ ipo.company_name|lower }}">
                 <div class="ipo-card">
                     {% if ipo.company_logo %}
-                        <img src="{{ ipo.company_logo.url }}" class="ipo-logo" alt="{{ ipo.company_name }} Logo">
-                    {% else %}
-                        <img src="https://bluestock.in/static/assets/logo/logo.webp" class="ipo-logo" alt="Company Logo">
-                    {% endif %}
+        <img src="{{ ipo.company_logo }}" class="ipo-logo" alt="{{ ipo.company_name }}">
+    {% else %}
+        <img src="https://bluestock.in/static/assets/logo/logo.webp" class="ipo-logo">
+    {% endif %}
                     
                     <h3 class="ipo-company-name">{{ ipo.company_name }}</h3>
                     

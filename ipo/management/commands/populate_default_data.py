@@ -18,7 +18,7 @@ class Command(BaseCommand):
         company1, created = Company.objects.get_or_create(
             name='Tech Innovators Inc.'
         )
-        company1.logo_url = 'https://bluestock.in/static/assets/logo/logo.webp'
+        company1.logo_url = 'https://rest.techbehemoths.com/storage/images/users/main/company-avatar-65bce8a217ef2-x2.png'
         company1.save()
         self.stdout.write(self.style.SUCCESS(
             f"{'Created' if created else 'Updated'} Company: {company1.name}"
@@ -27,7 +27,7 @@ class Command(BaseCommand):
         company2, created = Company.objects.get_or_create(
             name='Global Pharma Ltd.'
         )
-        company2.logo_url = 'https://upload.wikimedia.org/wikipedia/commons/a/ab/Logo_TV_2015.png'
+        company2.logo_url = 'https://global-pharma.com/gplogo.png'
         company2.save()
         self.stdout.write(self.style.SUCCESS(
             f"{'Created' if created else 'Updated'} Company: {company2.name}"
