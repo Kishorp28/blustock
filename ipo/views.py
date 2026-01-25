@@ -45,7 +45,7 @@ def home(request):
         
         ipos.append({
             'company_name': ipo.company.name,
-            'company_logo': ipo.company.logo_url if ipo.company.logo_url else None,
+            #'company_logo': ipo.company.logo_url if ipo.company.logo_url else None,
             'price_band': f"Rs {ipo.price_band_lower} - {ipo.price_band_upper}" if ipo.price_band_lower and ipo.price_band_upper else 'Not Issued',
             'open_date': ipo.open_date,
             'close_date': ipo.close_date,
@@ -57,11 +57,8 @@ def home(request):
         })
     faqs = FAQ.objects.filter(active=True).order_by('order')
     context = {'ipos': ipos, 'faqs': faqs}
-    companies = Company.objects.all()
-    return render(request, 'home.html', {
-        'companies': companies
-    })
-    #return render(request, 'upcoming_ipos.html', context)
+    
+    return render(request, 'upcoming_ipos.html', context)
 
 
 def ipo_detail(request, ipo_id):
