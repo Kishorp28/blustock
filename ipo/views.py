@@ -21,12 +21,47 @@ from django.core.paginator import Paginator
 
 
 def home(request):
-    companies_data = [
-        {'name': 'Tech Innovators Inc.', 'logo_url': 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRgY1-dRCsa1G2RzMV9S8THGC9uSW9rgNGqqA&s'},
-        {'name': 'Global Pharma Ltd.', 'logo_url': 'https://global-pharma.com/gplogo.png'},
-        {'name': 'Bluestock Innovations', 'logo_url': 'https://bluestock.in/static/assets/logo/logo.webp'},
-    ]
-    return render(request, 'home.html', {'companies': companies_data})
+    from .models import IPO, FAQ
+    ipos_qs = IPO.objects.filter(status='upcoming').select_related('company').prefetch_related('documents')
+    ipos = []
+    for ipo in ipos_qs:
+        doc = ipo.documents.first() if hasattr(ipo, 'documents') else None
+        
+        rhp_pdf_url = None
+        drhp_pdf_url = None
+        
+        if doc:
+            try:
+                if doc.rhp_pdf and hasattr(doc.rhp_pdf, 'url'):
+                    rhp_pdf_url = request.build_absolute_uri(doc.rhp_pdf.url)
+            except Exception as e:
+                print(f"Error getting RHP URL for {ipo.company.name}: {e}")
+                
+            try:
+                if doc.drhp_pdf and hasattr(doc.drhp_pdf, 'url'):
+                    drhp_pdf_url = request.build_absolute_uri(doc.drhp_pdf.url)
+            except Exception as e:
+                print(f"Error getting DRHP URL for {ipo.company.name}: {e}")
+        
+        ipos.append({
+            'company_name': ipo.company.name,
+            'company_logo': ipo.company.logo_url if ipo.company.logo_url else None,
+            'price_band': f"Rs {ipo.price_band_lower} - {ipo.price_band_upper}" if ipo.price_band_lower and ipo.price_band_upper else 'Not Issued',
+            'open_date': ipo.open_date,
+            'close_date': ipo.close_date,
+            'issue_size': ipo.issue_size,
+            'issue_type': dict(IPO.ISSUE_TYPE_CHOICES).get(ipo.issue_type, ipo.issue_type),
+            'listing_date': ipo.listing_date if ipo.listing_date else None,
+            'rhp_pdf_url': rhp_pdf_url,
+            'drhp_pdf_url': drhp_pdf_url,
+        })
+    faqs = FAQ.objects.filter(active=True).order_by('order')
+    context = {'ipos': ipos, 'faqs': faqs}
+    companies = Company.objects.all()
+    return render(request, 'upcoming_ipos.html', {
+        'companies': companies
+    })
+    #return render(request, 'upcoming_ipos.html', context)
 
 
 def ipo_detail(request, ipo_id):
