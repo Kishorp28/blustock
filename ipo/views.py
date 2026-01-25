@@ -45,7 +45,7 @@ def home(request):
         
         ipos.append({
             'company_name': ipo.company.name,
-            'company_logo': ipo.company.logo if ipo.company.logo else None,
+            'company_logo': ipo.company.logo_url if ipo.company.logo_url else None,
             'price_band': f"Rs {ipo.price_band_lower} - {ipo.price_band_upper}" if ipo.price_band_lower and ipo.price_band_upper else 'Not Issued',
             'open_date': ipo.open_date,
             'close_date': ipo.close_date,
@@ -201,7 +201,7 @@ def upcoming_ipos_view(request):
         
         ipos.append({
             'company_name': ipo.company.name,
-            'company_logo': ipo.company.logo if ipo.company.logo else None,
+            'company_logo': ipo.company.logo_url if ipo.company.logo_url else None,
             'price_band': f"Rs {ipo.price_band_lower} - {ipo.price_band_upper}" if ipo.price_band_lower and ipo.price_band_upper else 'Not Issued',
             'open_date': ipo.open_date,
             'close_date': ipo.close_date,
