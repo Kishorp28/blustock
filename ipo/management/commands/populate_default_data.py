@@ -12,17 +12,23 @@ class Command(BaseCommand):
         self.stdout.write(self.style.SUCCESS('Populating default data...'))
 
         # Create Companies
-        company1, created = Company.objects.get_or_create(name='Tech Innovators Inc.', defaults={'logo_url': 'https://example.com/tech_innovators_logo.png'})
+        company1, created = Company.objects.get_or_create(name='Tech Innovators Inc.', defaults={'logo_url': 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRgY1-dRCsa1G2RzMV9S8THGC9uSW9rgNGqqA&s'})
         if created:
             self.stdout.write(self.style.SUCCESS(f'Created Company: {company1.name}'))
         else:
             self.stdout.write(self.style.WARNING(f'Company already exists: {company1.name}'))
 
-        company2, created = Company.objects.get_or_create(name='Global Pharma Ltd.', defaults={'logo_url': 'https://example.com/global_pharma_logo.png'})
+        company2, created = Company.objects.get_or_create(name='Global Pharma Ltd.', defaults={'logo_url': 'https://global-pharma.com/gplogo.png'})
         if created:
             self.stdout.write(self.style.SUCCESS(f'Created Company: {company2.name}'))
         else:
             self.stdout.write(self.style.WARNING(f'Company already exists: {company2.name}'))
+
+        company3, created = Company.objects.get_or_create(name='Bluestock Innovations', defaults={'logo_url': 'https://bluestock.in/static/assets/logo/logo.webp'})
+        if created:
+            self.stdout.write(self.style.SUCCESS(f'Created Company: {company3.name}'))
+        else:
+            self.stdout.write(self.style.WARNING(f'Company already exists: {company3.name}'))
 
         # Create IPOs
         today = date.today()
@@ -81,6 +87,40 @@ class Command(BaseCommand):
             self.stdout.write(self.style.SUCCESS(f'Created IPO: {ipo3.company.name} (Listed)'))
         else:
             self.stdout.write(self.style.WARNING(f'IPO already exists for {ipo3.company.name} (Listed)'))
+
+        ipo4, created = IPO.objects.get_or_create(
+            company=company3,
+            open_date=today + timedelta(days=14),
+            close_date=today + timedelta(days=17),
+            defaults={
+                'price_band_lower': Decimal('250.00'),
+                'price_band_upper': Decimal('270.00'),
+                'issue_size': Decimal('750.00'),
+                'issue_type': 'book_building',
+                'status': 'upcoming',
+            }
+        )
+        if created:
+            self.stdout.write(self.style.SUCCESS(f'Created IPO: {ipo4.company.name} (Upcoming)'))
+        else:
+            self.stdout.write(self.style.WARNING(f'IPO already exists for {ipo4.company.name} (Upcoming)'))
+
+        ipo5, created = IPO.objects.get_or_create(
+            company=company2,
+            open_date=today + timedelta(days=21),
+            close_date=today + timedelta(days=24),
+            defaults={
+                'price_band_lower': Decimal('150.00'),
+                'price_band_upper': Decimal('160.00'),
+                'issue_size': Decimal('400.00'),
+                'issue_type': 'fixed_price',
+                'status': 'upcoming',
+            }
+        )
+        if created:
+            self.stdout.write(self.style.SUCCESS(f'Created IPO: {ipo5.company.name} (Upcoming)'))
+        else:
+            self.stdout.write(self.style.WARNING(f'IPO already exists for {ipo5.company.name} (Upcoming)'))
 
         # Create FAQs
         faq1, created = FAQ.objects.get_or_create(
