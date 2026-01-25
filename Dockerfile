@@ -15,5 +15,9 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Copy project
 COPY . /app
 
-# Run the Django application using Gunicorn
-CMD ["gunicorn", "ipo_management.wsgi:application", "--bind", "0.0.0.0:$PORT"]
+# Copy and make entrypoint.sh executable
+COPY entrypoint.sh /app/entrypoint.sh
+RUN chmod +x /app/entrypoint.sh
+
+# Run the Django application using Gunicorn via the entrypoint script
+ENTRYPOINT ["/app/entrypoint.sh"]
