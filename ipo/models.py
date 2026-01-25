@@ -4,7 +4,7 @@ from decimal import Decimal
 
 class Company(models.Model):
     name = models.CharField(max_length=200, unique=True)
-    logo = models.ImageField(upload_to='company_logos/', null=True, blank=True)
+    logo_url = models.URLField(max_length=500, null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 

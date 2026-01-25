@@ -12,13 +12,13 @@ class Command(BaseCommand):
         self.stdout.write(self.style.SUCCESS('Populating default data...'))
 
         # Create Companies
-        company1, created = Company.objects.get_or_create(name='Tech Innovators Inc.', defaults={'logo': None})
+        company1, created = Company.objects.get_or_create(name='Tech Innovators Inc.', defaults={'logo_url': 'https://example.com/tech_innovators_logo.png'})
         if created:
             self.stdout.write(self.style.SUCCESS(f'Created Company: {company1.name}'))
         else:
             self.stdout.write(self.style.WARNING(f'Company already exists: {company1.name}'))
 
-        company2, created = Company.objects.get_or_create(name='Global Pharma Ltd.', defaults={'logo': None})
+        company2, created = Company.objects.get_or_create(name='Global Pharma Ltd.', defaults={'logo_url': 'https://example.com/global_pharma_logo.png'})
         if created:
             self.stdout.write(self.style.SUCCESS(f'Created Company: {company2.name}'))
         else:
