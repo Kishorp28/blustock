@@ -3,7 +3,7 @@ from datetime import date, timedelta
 from decimal import Decimal
 
 from django.core.management.base import BaseCommand
-from ipo.models import Company, IPO, FAQ
+from ipo.models import Company, IPO, FAQ, Document
 
 class Command(BaseCommand):
     help = 'Populates the database with default IPO and Company data.'
@@ -49,6 +49,12 @@ class Command(BaseCommand):
             self.stdout.write(self.style.SUCCESS(f'Created IPO: {ipo1.company.name} (Upcoming)'))
         else:
             self.stdout.write(self.style.WARNING(f'IPO already exists for {ipo1.company.name} (Upcoming)'))
+
+        # Add Documents for ipo1
+        Document.objects.get_or_create(
+            ipo=ipo1,
+            defaults={'rhp_pdf': 'ipo_documents/rhp/tech_innovators_rhp.pdf', 'drhp_pdf': 'ipo_documents/drhp/tech_innovators_drhp.pdf'}
+        )
 
         ipo2, created = IPO.objects.get_or_create(
             company=company2,
