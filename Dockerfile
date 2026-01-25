@@ -12,6 +12,9 @@ WORKDIR /app
 COPY requirements.txt /app/requirements.txt
 RUN pip install --no-cache-dir -r requirements.txt
 
+# Install netcat for database readiness check
+RUN apt-get update && apt-get install -y netcat-traditional && rm -rf /var/lib/apt/lists/*
+
 # Copy project
 COPY . /app
 
