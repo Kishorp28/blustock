@@ -245,3 +245,6 @@ This project is licensed under the MIT License.
 ## Support
 
 For support and questions, please open an issue in the GitHub repository. 
+
+## 🔗 Live Application
+https://blustock-1.onrender.com
